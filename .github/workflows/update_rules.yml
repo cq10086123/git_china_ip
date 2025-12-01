@@ -22,7 +22,7 @@ jobs:
         run: |
           # ---------------- 配置区域 ----------------
           # 将下方的链接替换为你原始数据的真实链接
-          SOURCE_URL="https://raw.githubusercontent.com/username/repo/main/original.txt"
+          SOURCE_URL="https://raw.githubusercontent.com/17mon/china_ip_list/ad969874df17c5e15e437c682cd928309db5059c/china_ip_list.txt"
           # 输出的文件名
           OUTPUT_FILE="custom_ip_rules.list"
           # ----------------------------------------
