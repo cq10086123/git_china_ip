@@ -81,7 +81,7 @@ jobs:
           
           # --- 任务组 1: 国内 IP 规则 (存入 ip_cn.list) ---
           # 示例 1：纯 IP 列表
-          fetch_rule "https://github.com/mayaxcn/china-ip-list/blob/master/chnroute.txt" "china_ip.list" "raw"
+          fetch_rule "https://raw.githubusercontent.com/mayaxcn/china-ip-list/refs/heads/master/chnroute.txt" "china_ip.list" "raw"
           fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/refs/heads/master/provider/aliyun-cidr-ipv4.txt" " yun_fuwuqi.list" "raw"
           fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/refs/heads/master/provider/aliyun-cidr-ipv4.txt" " yun_fuwuqi.list" "raw"
           fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/refs/heads/master/provider/tencent-cidr-ipv4.txt" " yun_fuwuqi.list" "raw"
