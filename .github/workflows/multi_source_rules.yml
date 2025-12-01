@@ -73,8 +73,9 @@ jobs:
           > china_ip.list
           > yun_fuwuqi.list
           > china_yuming.list
-          > china_Advertising.list
+          #> china_Advertising.list
           > china_zhilian.list
+          > china_juyuwang.list
 
           # =======================================================
           # 3. 配置下载任务 (保持不变)
@@ -88,11 +89,11 @@ jobs:
           fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/tencent-cidr-ipv4.txt" "yun_fuwuqi.list" "prefix_only"
           fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/huawei-cidr-ipv4.txt" "yun_fuwuqi.list" "prefix_only"
           fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/baidu-cidr-ipv4.txt" "yun_fuwuqi.list" "prefix_only"
-          #fetch_rule "https://static-file-global.353355.xyz/rules/cn-additional-list.txt" "china_yuming.list" "direct"
+          fetch_rule "https://github.com/darriousliu/ACL4SSR/blob/master/Clash/LocalAreaNetwork.list" "china_juyuwang.list" "direct"
 
           # --- 任务组 3: 域名/混合规则 (使用 direct 模式的文件) ---
           fetch_rule "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/China/China.list" "china_yuming.list" "direct"
-          fetch_rule "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/AdvertisingLite/AdvertisingLite.list" "china_Advertising.list" "direct"
+          #fetch_rule "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/AdvertisingLite/AdvertisingLite.list" "china_Advertising.list" "direct"
           fetch_rule "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Direct/Direct.list" "china_zhilian.list" "direct"
 
           # =======================================================
