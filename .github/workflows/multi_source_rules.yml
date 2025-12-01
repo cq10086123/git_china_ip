@@ -98,7 +98,7 @@ jobs:
           #fetch_rule "https://raw.githubusercontent.com/example/repo/tg_ips.txt" "ip_telegram.list" "raw"
           
           # 示例 5：xxx.xxx/xx,no-resolve 格式，需补 IP-CIDR,
-          fetch_rule "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/China/China.list" "hina_yuming.list" "direct"
+          fetch_rule "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/China/China.list" "china_yuming.list" "direct"
 
           # =======================================================
           # 4. 批量去重与清理 (自动处理所有 .list 文件)
