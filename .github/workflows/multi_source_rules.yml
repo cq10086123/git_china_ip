@@ -1,14 +1,11 @@
 name: Update Split Rules
 
 # 触发条件：
-# 1. 每天自动运行一次 (例如：国际标准时间 02:00)
-# 2. 支持手动点击 "Run workflow" 按钮触发
 on:
   schedule:
     - cron: '0 2 * * *'
   workflow_dispatch:
 
-# 赋予工作流写入仓库内容的权限
 permissions:
   contents: write
 
@@ -22,10 +19,7 @@ jobs:
       - name: Process Rules to Separate Files
         run: |
           # =======================================================
-          # 1. 定义核心处理函数 (包含四种模式)
-          # 参数1: URL (下载地址)
-          # 参数2: TARGET_FILE (保存的文件名)
-          # 参数3: MODE (模式: raw / suffix / prefix / direct)
+          # 1. 定义核心处理函数 (已加入 prefix_only 模式，共五种)
           # =======================================================
           fetch_rule() {
             local url=$1
@@ -34,23 +28,26 @@ jobs:
             
             echo "正在处理: $url -> $target_file [模式: $mode]"
             
-            # 下载到临时文件
-            curl -sL "$url" -o temp_data.txt
+            # 使用 -f 忽略下载错误，让脚本继续运行
+            curl -sL -f "$url" -o temp_data.txt
             
-            # 确保目标文件存在，如果不存在则创建
             touch "$target_file"
 
             # 根据模式处理并追加(>>)到目标文件
             if [ "$mode" == "raw" ]; then
-               # 模式 A (raw): 纯 IP (1.1.1.1/24) -> 加前后缀
+               # 模式 A (raw): 纯 IP -> 加 IP-CIDR, 和 ,no-resolve (用于代理 IP 段)
                awk 'NF {print "IP-CIDR,"$0",no-resolve"}' temp_data.txt >> "$target_file"
             
             elif [ "$mode" == "suffix" ]; then
-               # 模式 B (suffix): 缺后缀 (IP-CIDR,1.1.1.1/24) -> 补 ,no-resolve
+               # 模式 B (suffix): 缺后缀 -> 补 ,no-resolve
                awk 'NF {print $0",no-resolve"}' temp_data.txt >> "$target_file"
             
             elif [ "$mode" == "prefix" ]; then
-               # 模式 D (prefix): 缺前缀 (1.1.1.1/24,no-resolve) -> 补 IP-CIDR,
+               # 模式 D (prefix): 缺前缀 -> 补 IP-CIDR,
+               awk 'NF {print "IP-CIDR,"$0}' temp_data.txt >> "$target_file"
+            
+            elif [ "$mode" == "prefix_only" ]; then
+               # 模式 E (新增): 纯 IP -> 仅补 IP-CIDR, (专用于国内 IP 直连)
                awk 'NF {print "IP-CIDR,"$0}' temp_data.txt >> "$target_file"
             
             elif [ "$mode" == "direct" ]; then
@@ -58,50 +55,39 @@ jobs:
                awk 'NF {print $0}' temp_data.txt >> "$target_file"
             fi
             
-            # 清理临时文件
-            rm temp_data.txt
-            # 补换行符，防止文件粘连
+            rm -f temp_data.txt
             echo "" >> "$target_file"
           }
 
           # =======================================================
-          # 2. 初始化/清空旧文件 (重要！)
-          # 在这里列出你所有要生成的文件名，先清空它们，防止内容无限堆积
+          # 2. 初始化/清空旧文件 (重要！) 确保清理所有潜在的文件
           # =======================================================
           > china_ip.list
           > yun_fuwuqi.list
           > china_yuming.list
-          #> ip_telegram.list
-          #> ip_google.list
-          # 如果您还有其他文件，请在这里继续添加清空命令：
-          # > my_other_rules.list
+          > custom_ip_rules.list # 清理残留文件
 
           # =======================================================
-          # 3. 配置下载任务 (替换为您真实的 URL)
+          # 3. 配置下载任务 (已修正 URL 和 MODE)
           # =======================================================
           
-          # --- 任务组 1: 国内 IP 规则 (存入 ip_cn.list) ---
-          # 示例 1：纯 IP 列表
-          fetch_rule "https://raw.githubusercontent.com/mayaxcn/china-ip-list/refs/heads/master/chnroute.txt" "china_ip.list" "raw"
-          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/refs/heads/master/provider/aliyun-cidr-ipv4.txt" "yun_fuwuqi.list" "raw"
-          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/refs/heads/master/provider/aliyun-cidr-ipv4.txt" "yun_fuwuqi.list" "raw"
-          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/refs/heads/master/provider/tencent-cidr-ipv4.txt" "yun_fuwuqi.list" "raw"
-          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/refs/heads/master/provider/huawei-cidr-ipv4.txt" "yun_fuwuqi.list" "raw"
-          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/refs/heads/master/provider/baidu-cidr-ipv4.txt" "yun_fuwuqi.list" "raw"
+          # --- 任务组 1: 国内 IP 规则 (china_ip.list) ---
+          # !! 修正为 prefix_only 模式和正确的 raw URL 格式 !!
+          fetch_rule "https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute.txt" "china_ip.list" "prefix_only"
           
-          # 示例 2：IP-CIDR,xxx.xxx.xxx/xx 格式，但无需 no-resolve 的（因为国内直连）
-          #fetch_rule "https://raw.githubusercontent.com/17mon/china_ip_list/refs/heads/master/noa_list.txt" "custom_ip_rules.list" "raw"
+          # --- 任务组 2: 云服务 IP 规则 (yun_fuwuqi.list) ---
+          # !! 修正为 prefix_only 模式和正确的 raw URL 格式 !!
+          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/aliyun-cidr-ipv4.txt" "yun_fuwuqi.list" "prefix_only"
+          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/tencent-cidr-ipv4.txt" "yun_fuwuqi.list" "prefix_only"
+          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/huawei-cidr-ipv4.txt" "yun_fuwuqi.list" "prefix_only"
+          fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/baidu-cidr-ipv4.txt" "yun_fuwuqi.list" "prefix_only"
           
-          # 示例 3：IP-CIDR,xxx.xxx/xx 格式，需补 no-resolve
-          #fetch_rule "https://raw.githubusercontent.com/example/repo/tg_rules_1.list" "ip_telegram.list" "suffix"
-          # 示例 4：纯 IP 格式
-          #fetch_rule "https://raw.githubusercontent.com/example/repo/tg_ips.txt" "ip_telegram.list" "raw"
-          
-          # 示例 5：xxx.xxx/xx,no-resolve 格式，需补 IP-CIDR,
-          fetch_rule "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/China/China.list" "china_yuming.list" "direct"
+          # --- 任务组 3: 域名规则 (china_yuming.list) ---
+          # !! 修正为正确的 raw URL 格式 !!
+          fetch_rule "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/China/China.list" "china_yuming.list" "direct"
 
           # =======================================================
-          # 4. 批量去重与清理 (自动处理所有 .list 文件)
+          # 4. 批量去重与清理 (已添加域名文件跳过过滤逻辑)
           # =======================================================
           echo "正在优化所有列表文件..."
           
@@ -109,8 +95,16 @@ jobs:
           for file in *.list; do
             if [ -f "$file" ]; then
               echo "优化文件: $file"
-              # 排序 + 去重 + 过滤非 IP-CIDR 的无效行 -> 覆盖回原文件
-              sort -u "$file" | grep "IP-CIDR" > "${file}.tmp"
+              
+              if [ "$file" == "china_yuming.list" ]; then
+                # 域名文件：只排序去重
+                sort -u "$file" > "${file}.tmp"
+                echo "【注意】域名文件已跳过 IP-CIDR 过滤。"
+              else
+                # IP 文件：排序、去重和 IP-CIDR 过滤
+                sort -u "$file" | grep "IP-CIDR" > "${file}.tmp"
+              fi
+              
               mv "${file}.tmp" "$file"
               echo "优化后总行数: $(wc -l < "$file")"
             fi
@@ -125,8 +119,8 @@ jobs:
           # 添加所有 .list 文件
           git add *.list
           
-          # 提交更改 (如果没有更改则忽略错误)
-          git commit -m "Auto update split rules: $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          # 提交更改 (如果提交成功，则 exit code 为 0；如果无更改，我们允许 exit code 为 0)
+          git commit -m "Auto update split rules: $(date +'%Y-%m-%d')" || exit 0
           
           # 推送回仓库
           git push
