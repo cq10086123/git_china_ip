@@ -1,0 +1,58 @@
+name: Auto Update IP Rules
+
+# 触发条件：
+# 1. 每天国际标准时间 02:00 (北京时间 10:00) 自动运行
+# 2. 支持手动点击 "Run workflow" 按钮触发
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download and Process Data
+        run: |
+          # ---------------- 配置区域 ----------------
+          # 将下方的链接替换为你原始数据的真实链接
+          SOURCE_URL="https://raw.githubusercontent.com/username/repo/main/original.txt"
+          # 输出的文件名
+          OUTPUT_FILE="custom_ip_rules.list"
+          # ----------------------------------------
+
+          echo "正在下载原始数据..."
+          curl -sL "$SOURCE_URL" -o raw_data.txt
+
+          echo "正在转换格式..."
+          # 使用 awk 命令进行格式转换
+          # 逻辑：读取每一行，在前面加 "IP-CIDR,"，在后面加 ",no-resolve"
+          # NF 确保忽略空行
+          awk 'NF {print "IP-CIDR,"$0",no-resolve"}' raw_data.txt > "$OUTPUT_FILE"
+
+          # 清理临时文件
+          rm raw_data.txt
+          
+          echo "预览前5行内容："
+          head -n 5 "$OUTPUT_FILE"
+
+      - name: Commit and Push changes
+        run: |
+          # 配置 Git 用户信息（用于提交记录）
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # 添加文件
+          git add .
+          
+          # 提交更改 (如果没有更改则忽略错误)
+          git commit -m "Auto update IP rules: $(date +'%Y-%m-%d')" || echo "No changes to commit"
+          
+          # 推送回仓库
+          git push
