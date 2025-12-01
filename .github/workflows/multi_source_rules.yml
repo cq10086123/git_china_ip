@@ -1,1 +1,96 @@
+name: Update Multi-Source Rules
 
+on:
+  schedule:
+    - cron: '0 2 * * *' # 每天自动运行
+  workflow_dispatch:    # 支持手动运行
+
+permissions:
+  contents: write
+
+jobs:
+  merge-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Process and Merge Rules
+        run: |
+          # 定义最终输出的文件名
+          OUTPUT_FILE="combined_rules.list"
+          # 清空/创建输出文件
+          > "$OUTPUT_FILE"
+
+          # =======================================================
+          # 定义处理函数 (不用改这里，改下面的调用区域即可)
+          # 参数1: URL
+          # 参数2: 模式 (raw / suffix / direct)
+          # =======================================================
+          process_url() {
+            local url=$1
+            local mode=$2
+            echo "正在处理: $url [模式: $mode]"
+            
+            # 下载到临时文件 temp_source.txt
+            curl -sL "$url" -o temp_source.txt
+            
+            # 根据模式进行处理并追加到输出文件
+            if [ "$mode" == "raw" ]; then
+               # 模式 A: 原始 IP -> 加前后缀
+               awk 'NF {print "IP-CIDR,"$0",no-resolve"}' temp_source.txt >> "$OUTPUT_FILE"
+            
+            elif [ "$mode" == "suffix" ]; then
+               # 模式 B: 已有前缀 -> 补后缀
+               awk 'NF {print $0",no-resolve"}' temp_source.txt >> "$OUTPUT_FILE"
+            
+            elif [ "$mode" == "direct" ]; then
+               # 模式 C: 格式完美 -> 直接复制
+               awk 'NF {print $0}' temp_source.txt >> "$OUTPUT_FILE"
+            fi
+            
+            # 必须加一个换行符，防止文件末尾没有换行导致合并出错
+            echo "" >> "$OUTPUT_FILE"
+          }
+
+          # =======================================================
+          # 🚀 配置区域：在这里添加您的所有链接
+          # =======================================================
+
+          # 1. 【纯 IP 格式】 (例如: 1.0.1.0/24)
+          #    会自动变成: IP-CIDR,1.0.1.0/24,no-resolve
+          process_url "https://example.com/raw_ips.txt" "raw"
+          process_url "https://example.com/another_raw.txt" "raw"
+
+          # 2. 【缺后缀格式】 (例如: IP-CIDR,1.0.1.0/24)
+          #    会自动变成: IP-CIDR,1.0.1.0/24,no-resolve
+          process_url "https://example.com/missing_suffix.txt" "suffix"
+
+          # 3. 【完美格式】 (例如: IP-CIDR,1.0.1.0/24,no-resolve)
+          #    直接合并，不修改
+          process_url "https://example.com/perfect_list.list" "direct"
+
+          # =======================================================
+          # 后期处理：去重与清理
+          # =======================================================
+          
+          echo "正在去重和清理..."
+          # 1. sort -u: 排序并去重
+          # 2. grep: 确保只保留包含 IP-CIDR 的有效行
+          # 3. 覆盖回原文件
+          sort -u "$OUTPUT_FILE" | grep "IP-CIDR" > final_temp.list
+          mv final_temp.list "$OUTPUT_FILE"
+          
+          # 删除临时下载文件
+          rm temp_source.txt
+          
+          echo "处理完成，总行数："
+          wc -l "$OUTPUT_FILE"
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "Update rules: $(date +'%Y-%m-%d')" || echo "No changes"
+          git push
