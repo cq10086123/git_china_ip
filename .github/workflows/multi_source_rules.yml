@@ -92,7 +92,7 @@ jobs:
           # =======================================================
           
           # --- 任务组 1: 国内 IP 规则 (china_ip.list) ---
-          fetch_rule "https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute.txt" "china_ip.list" "prefix_only"
+          fetch_rule "https://raw.githubusercontent.com/mayaxcn/china-ip-list/master/chnroute.txt" "china_ip.list" "raw"
           
           # --- 任务组 2: 云服务 IP 规则 (yun_fuwuqi.list) ---
           fetch_rule "https://raw.githubusercontent.com/axpwx/IP-Data/master/provider/aliyun-cidr-ipv4.txt" "yun_fuwuqi.list" "raw"
