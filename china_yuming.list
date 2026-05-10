@@ -1,18 +1,17 @@
 
 # AUTHOR: blackmatrix7,no-resolve
 # DOMAIN-KEYWORD: 9,no-resolve
-# DOMAIN-SUFFIX: 3677,no-resolve
-# DOMAIN: 20,no-resolve
+# DOMAIN-SUFFIX: 3676,no-resolve
+# DOMAIN: 17,no-resolve
 # IP-CIDR6: 4,no-resolve
 # IP-CIDR: 17,no-resolve
 # NAME: China,no-resolve
 # REPO: https://github.com/blackmatrix7/ios_rule_script,no-resolve
-# TOTAL: 3727,no-resolve
-# UPDATED: 2026-04-10 02:24:17,no-resolve
+# TOTAL: 3723,no-resolve
+# UPDATED: 2026-05-10 02:21:40,no-resolve
 DOMAIN,analytics.strava.com,no-resolve
 DOMAIN,blzddist1-a.akamaihd.net,no-resolve
 DOMAIN,cdn.angruo.com,no-resolve
-DOMAIN,cdn.lilyemby.com,no-resolve
 DOMAIN,client.amplifi.com,no-resolve
 DOMAIN,download.jetbrains.com,no-resolve
 DOMAIN,download.microsoft.com,no-resolve
@@ -22,10 +21,8 @@ DOMAIN,kc.kexinshe.com,no-resolve
 DOMAIN,ntservicepack.microsoft.com,no-resolve
 DOMAIN,origin-a.akamaihd.ne,no-resolve
 DOMAIN,origin-a.akamaihd.net,no-resolve
-DOMAIN,smart.uhdnow.com,no-resolve
 DOMAIN,sms.imagetasks.com,no-resolve
 DOMAIN,steamcommunity-a.akamaihd.net,no-resolve
-DOMAIN,tx.lilyemby.com,no-resolve
 DOMAIN,weixin.com,no-resolve
 DOMAIN,www.libvideo.com,no-resolve
 DOMAIN,www.yxssp.com,no-resolve
@@ -1963,7 +1960,6 @@ DOMAIN-SUFFIX,jiayuan.com,no-resolve
 DOMAIN-SUFFIX,jiazhao.com,no-resolve
 DOMAIN-SUFFIX,jibencaozuo.com,no-resolve
 DOMAIN-SUFFIX,jidian.im,no-resolve
-DOMAIN-SUFFIX,jiedaibao.gs,no-resolve
 DOMAIN-SUFFIX,jiemeng8.com,no-resolve
 DOMAIN-SUFFIX,jiemian.com,no-resolve
 DOMAIN-SUFFIX,jikeiot.cloud,no-resolve
