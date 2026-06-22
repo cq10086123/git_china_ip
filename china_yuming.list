@@ -1,14 +1,14 @@
 
 # AUTHOR: blackmatrix7,no-resolve
 # DOMAIN-KEYWORD: 9,no-resolve
-# DOMAIN-SUFFIX: 3676,no-resolve
+# DOMAIN-SUFFIX: 3674,no-resolve
 # DOMAIN: 17,no-resolve
 # IP-CIDR6: 4,no-resolve
 # IP-CIDR: 17,no-resolve
 # NAME: China,no-resolve
 # REPO: https://github.com/blackmatrix7/ios_rule_script,no-resolve
-# TOTAL: 3723,no-resolve
-# UPDATED: 2026-05-10 02:21:40,no-resolve
+# TOTAL: 3721,no-resolve
+# UPDATED: 2026-06-22 02:36:19,no-resolve
 DOMAIN,analytics.strava.com,no-resolve
 DOMAIN,blzddist1-a.akamaihd.net,no-resolve
 DOMAIN,cdn.angruo.com,no-resolve
@@ -1387,8 +1387,6 @@ DOMAIN-SUFFIX,funcdn.com,no-resolve
 DOMAIN-SUFFIX,funnycore.com,no-resolve
 DOMAIN-SUFFIX,funshion.com,no-resolve
 DOMAIN-SUFFIX,funshion.net,no-resolve
-DOMAIN-SUFFIX,futu5.com,no-resolve
-DOMAIN-SUFFIX,futunn.com,no-resolve
 DOMAIN-SUFFIX,fuwai.com,no-resolve
 DOMAIN-SUFFIX,fuwj.com,no-resolve
 DOMAIN-SUFFIX,fxxz.com,no-resolve
